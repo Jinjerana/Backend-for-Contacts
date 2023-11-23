@@ -2,18 +2,22 @@ import express from 'express';
 
 import contactsController from '../../controllers/contactsController.js';
 
-import isEmptyBody from '../../middlewares/isEmptyBody.js';
-
 const contactsRouter = express.Router();
 
-contactsRouter.get('/', contactsController.getAllContacts);
+contactsRouter
+	.route('/')
+	.get(contactsController.getAllContacts)
+	.post(contactsController.add);
 
-contactsRouter.get('/:contactId', contactsController.getById);
+contactsRouter
+	.route('/:contactId')
+	.get(contactsController.getById)
+	.put(contactsController.updateById)
+	.delete(contactsController.deleteById);
 
-contactsRouter.post('/', isEmptyBody, contactsController.add);
-
-contactsRouter.put('/:contactId', isEmptyBody, contactsController.updateById);
-
-contactsRouter.delete('/:contactId', contactsController.deleteById);
+contactsRouter.patch(
+	'/:contactId/favorite',
+	contactsController.updateByIdFavorite
+);
 
 export default contactsRouter;
