@@ -12,7 +12,7 @@ const signup = async (req, res) => {
 	const { email, password } = req.body;
 	const user = await User.findOne({ email });
 	if (user) {
-		throw HttpError(409, 'Email in use');
+		throw new HttpError(409, 'Email in use');
 	}
 
 	const hashPassword = await bcrypt.hash(password, 10);
