@@ -1,12 +1,15 @@
 import bcrypt from 'bcryptjs';
 
 import User from '../models/users.js';
+import { Jwt } from 'jsonwebtoken';
 
 import HttpError from '../helpers/HttpError.js';
 
 import ctrlWrapper from '../Wrapper/ctrlWrapper.js';
 
 import { userSignupSchema, userSigninSchema } from '../schemas/auth-schemas.js';
+
+const { JWT_SECRET } = process.env;
 
 const signup = async (req, res) => {
 	const { email, password } = req.body;
@@ -36,7 +39,11 @@ const signin = async (req, res) => {
 		throw new HttpError(401, 'Password is invalid');
 	}
 
-	const token = 'hjhkjb.678dj8.4444';
+	const payload = {
+		id: user._id,
+	};
+
+	const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '23h' });
 
 	res.json({
 		token,
