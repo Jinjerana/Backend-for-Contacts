@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 import User from '../models/users.js';
-import { Jwt } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 import HttpError from '../helpers/HttpError.js';
 
