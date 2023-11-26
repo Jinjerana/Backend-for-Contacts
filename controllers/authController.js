@@ -9,6 +9,8 @@ import ctrlWrapper from '../Wrapper/ctrlWrapper.js';
 
 import { userSignupSchema, userSigninSchema } from '../schemas/auth-schemas.js';
 
+configDotenv.configDotenv();
+
 const { JWT_SECRET } = process.env;
 
 const signup = async (req, res) => {
