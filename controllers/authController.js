@@ -25,6 +25,25 @@ const signup = async (req, res) => {
 	});
 };
 
+const signin = async (req, res) => {
+	const { email, password } = req.body;
+	const user = await User.findOne({ email });
+	if (!user) {
+		throw new HttpError(401, 'email or password invalid');
+	}
+	const passwordCompare = await bcrypt.compare(password, user.password);
+	if (!passwordCompare) {
+		throw new HttpError(401, 'Password is invalid');
+	}
+
+	const token = 'hjhkjb.678dj8.4444';
+
+	res.json({
+		token,
+	});
+};
+
 export default {
 	signup: ctrlWrapper(signup),
+	signin: ctrlWrapper(signin),
 };
