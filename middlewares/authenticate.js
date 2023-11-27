@@ -17,9 +17,9 @@ const authenticate = async (req, res, next) => {
 		return next(HttpError(401, 'Invalid password'));
 	}
 	try {
-		const { id } = jwt.verify(token, JWT_SECRET);
+		const { contactId } = jwt.verify(token, JWT_SECRET);
 		const user = await User.findById(contactId);
-		if (!user) {
+		if (!user || !user.token || user.token !== token) {
 			return next(HttpError(401, 'User not found'));
 		}
 		next();
