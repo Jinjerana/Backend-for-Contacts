@@ -1,10 +1,14 @@
-import { Jwt } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+
+import dotenv from 'dotenv';
 
 import User from '../models/users.js';
 
 import HttpError from '../helpers/HttpError.js';
 
 const { JWT_SECRET } = process.env;
+
+dotenv.config();
 
 const authenticate = async (req, res, next) => {
 	const { authorization } = req.body;
