@@ -6,15 +6,20 @@ import User from '../models/users.js';
 
 import HttpError from '../helpers/HttpError.js';
 
+import ctrlWrapper from '../Wrapper/ctrlWrapper.js';
+
 const { JWT_SECRET } = process.env;
 
 dotenv.config();
 
 const authenticate = async (req, res, next) => {
 	const { authorization } = req.headers;
+	if (!authorization) {
+		throw new HttpError(401, 'Authorization header not found');
+	}
 	const [bearer, token] = authorization.split(' ');
 	if (bearer !== 'Bearer') {
-		throw new HttpError(401, 'Invalid password');
+		throw new HttpError(401, 'Invalid signature');
 	}
 	try {
 		const { contactId } = jwt.verify(token, JWT_SECRET);
@@ -22,10 +27,11 @@ const authenticate = async (req, res, next) => {
 		if (!user || !user.token || user.token !== token) {
 			throw new HttpError(401, 'User not found');
 		}
+		req.user = user;
 		next();
 	} catch (error) {
 		throw new HttpError(401, 'Invalid password');
 	}
 };
 
-export default authenticate;
+export default ctrlWrapper(authenticate);

@@ -43,7 +43,7 @@ const signin = async (req, res) => {
 	}
 
 	const payload = {
-		id: user._id,
+		contactId: user._id,
 	};
 
 	const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '23h' });
@@ -59,10 +59,9 @@ const signin = async (req, res) => {
 };
 
 const getCurrent = async (req, res) => {
-	const { username, email } = req.user;
+	const { email } = req.user;
 
 	res.json({
-		username,
 		email,
 	});
 };

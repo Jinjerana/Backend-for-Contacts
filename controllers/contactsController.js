@@ -11,13 +11,21 @@ import {
 } from '../schemas/contact-schemas.js';
 
 const getAllContacts = async (req, res) => {
-	const result = await Contact.find();
+	const { _id: owner } = req.user;
+	const { page = 1, limit = 10 } = req.query;
+	const skip = (page - 1) * limit;
+
+	const result = await Contact.find({ owner }, '-createdAt -updatedAt', {
+		skip,
+		limit,
+	}).populate('owner');
 	res.json(result);
 };
 
 const add = async (req, res) => {
+	const { _id: owner } = req.user;
 	const { error } = contactAddSchema.validate(req.body);
-	const result = await Contact.create(req.body);
+	const result = await Contact.create({ ...req.body, owner });
 	if (error) {
 		throw new HttpError(406, error.message);
 	}
@@ -26,8 +34,9 @@ const add = async (req, res) => {
 
 const getById = async (req, res) => {
 	const { contactId } = req.params;
+	const { _id: owner } = req.user;
 	const { error } = contactUpdateById.validate(req.body);
-	const result = await Contact.findById(contactId);
+	const result = await Contact.findById({ _id: contactId, owner });
 	if (error) {
 		throw new HttpError(404, `Contact with id=${contactId} not found`);
 	}
@@ -36,8 +45,12 @@ const getById = async (req, res) => {
 
 const updateById = async (req, res) => {
 	const { contactId } = req.params;
+	const { _id: owner } = req.user;
 	const { error } = contactUpdateById.validate(req.body);
-	const result = await Contact.findByIdAndUpdate(contactId, req.body);
+	const result = await Contact.findOneAndUpdate(
+		{ _id: contactId, owner },
+		req.body
+	);
 	if (error) {
 		throw new HttpError(404, `Contact with id=${contactId} not found`);
 	}
@@ -46,8 +59,12 @@ const updateById = async (req, res) => {
 
 const updateByIdFavorite = async (req, res) => {
 	const { contactId } = req.params;
+	const { _id: owner } = req.user;
 	const { error } = contactFavoriteSchema.validate(req.body);
-	const result = await Contact.findByIdAndUpdate(contactId, req.body);
+	const result = await Contact.findOneAndUpdate(
+		{ _id: contactId, owner },
+		req.body
+	);
 	if (error) {
 		throw new HttpError(404, `Contact with id=${contactId} not found`);
 	}
@@ -56,7 +73,8 @@ const updateByIdFavorite = async (req, res) => {
 
 const deleteById = async (req, res) => {
 	const { contactId } = req.params;
-	const result = await Contact.findByIdAndDelete(contactId);
+	const { _id: owner } = req.user;
+	const result = await Contact.findOneAndDelete({ _id: contactId, owner });
 	if (!result) {
 		throw new HttpError(404, `Contact with id=${contactId} not found`);
 	}
