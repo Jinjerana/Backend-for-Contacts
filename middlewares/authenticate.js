@@ -11,20 +11,20 @@ const { JWT_SECRET } = process.env;
 dotenv.config();
 
 const authenticate = async (req, res, next) => {
-	const { authorization } = req.body;
+	const { authorization } = req.headers;
 	const [bearer, token] = authorization.split(' ');
 	if (bearer !== 'Bearer') {
-		return next(HttpError(401, 'Invalid password'));
+		throw new HttpError(401, 'Invalid password');
 	}
 	try {
 		const { contactId } = jwt.verify(token, JWT_SECRET);
 		const user = await User.findById(contactId);
 		if (!user || !user.token || user.token !== token) {
-			return next(HttpError(401, 'User not found'));
+			throw new HttpError(401, 'User not found');
 		}
 		next();
 	} catch (error) {
-		return next(HttpError(401, 'Invalid password'));
+		throw new HttpError(401, 'Invalid password');
 	}
 };
 

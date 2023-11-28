@@ -11,10 +11,10 @@ export const userSignupSchema = Joi.object({
 		'any.required': `"email" is a required field`,
 		'string.base': `"email" should be a type of 'text'`,
 	}),
-	subscription: Joi.string().required().messages({
-		'any.required': `"subscription" is a required field`,
-		'string.base': `"subscription" should be a type of 'text'`,
-	}),
+	// subscription: Joi.string().required().messages({
+	// 	'any.required': `"subscription" is a required field`,
+	// 	'string.base': `"subscription" should be a type of 'text'`,
+	// }),
 });
 
 export const userSigninSchema = Joi.object().keys({

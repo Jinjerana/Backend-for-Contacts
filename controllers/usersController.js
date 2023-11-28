@@ -35,11 +35,11 @@ const signin = async (req, res) => {
 	const { email, password } = req.body;
 	const user = await User.findOne({ email });
 	if (!user) {
-		throw new HttpError(401, 'email or password invalid');
+		throw new HttpError(401, 'email or password is wrong');
 	}
 	const passwordCompare = await bcrypt.compare(password, user.password);
 	if (!passwordCompare) {
-		throw new HttpError(401, 'Password is invalid');
+		throw new HttpError(401, 'email or password is wrong');
 	}
 
 	const payload = {
@@ -53,7 +53,7 @@ const signin = async (req, res) => {
 		token,
 		user: {
 			email,
-			subscription,
+			// subscription,
 		},
 	});
 };
