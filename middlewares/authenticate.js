@@ -14,6 +14,7 @@ dotenv.config();
 
 const authenticate = async (req, res, next) => {
 	const { authorization } = req.headers;
+	console.log(authorization);
 	if (!authorization) {
 		throw new HttpError(401, 'Authorization header not found');
 	}
@@ -30,7 +31,8 @@ const authenticate = async (req, res, next) => {
 		req.user = user;
 		next();
 	} catch (error) {
-		throw new HttpError(401, 'Invalid password');
+		console.log(error);
+		throw new HttpError(401, 'Unauthorized');
 	}
 };
 
