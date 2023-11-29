@@ -23,11 +23,15 @@ const authenticate = async (req, res, next) => {
 		throw new HttpError(401, 'Invalid signature');
 	}
 	try {
-		const { contactId } = jwt.verify(token, JWT_SECRET);
-		const user = await User.findById(contactId);
-		if (!user || !user.token || user.token !== token) {
-			throw new HttpError(401, 'User not found');
-		}
+		const { id } = jwt.verify(token, JWT_SECRET);
+		// const user = await User.findById(_id);
+		// if (!user || !user.token || user.token !== token) {
+		// 	throw new HttpError(401, 'User not found');
+		// }
+
+		// const { _id } = req.user;
+		// await User.findByIdAndUpdate(_id, { token: '' });
+
 		req.user = user;
 		next();
 	} catch (error) {
