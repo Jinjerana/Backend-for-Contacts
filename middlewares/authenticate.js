@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import dotenv from 'dotenv';
@@ -8,9 +9,9 @@ import HttpError from '../helpers/HttpError.js';
 
 import ctrlWrapper from '../Wrapper/ctrlWrapper.js';
 
-const { JWT_SECRET } = process.env;
-
 dotenv.config();
+
+const { JWT_SECRET } = process.env;
 
 const authenticate = async (req, res, next) => {
 	const { authorization } = req.headers;
@@ -23,14 +24,11 @@ const authenticate = async (req, res, next) => {
 		throw new HttpError(401, 'Invalid signature');
 	}
 	try {
-		const { id } = jwt.verify(token, JWT_SECRET);
-		// const user = await User.findById(_id);
-		// if (!user || !user.token || user.token !== token) {
-		// 	throw new HttpError(401, 'User not found');
-		// }
-
-		// const { _id } = req.user;
-		// await User.findByIdAndUpdate(_id, { token: '' });
+		const { contactId } = jwt.verify(token, JWT_SECRET);
+		const user = await User.findById(contactId);
+		if (!user || !user.token || user.token !== token) {
+			throw new HttpError(401, 'User not found');
+		}
 
 		req.user = user;
 		next();
