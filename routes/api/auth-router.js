@@ -6,6 +6,8 @@ import usersController from '../../controllers/usersController.js';
 
 import authenticate from '../../middlewares/authenticate.js';
 
+// import gravatar from '../../middlewares/gravatar.js';
+
 usersRouter.post('/signup', usersController.signup);
 
 usersRouter.post('/signin', usersController.signin);

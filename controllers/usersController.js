@@ -1,8 +1,12 @@
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
+import gravatar from 'gravatar';
+import crypto from 'crypto';
 
 import User from '../models/users.js';
 import jwt from 'jsonwebtoken';
+
+import generateAvatarUrl from '../middlewares/gravatar.js';
 
 import HttpError from '../helpers/HttpError.js';
 
@@ -23,7 +27,26 @@ const signup = async (req, res) => {
 
 	const hashPassword = await bcrypt.hash(password, 10);
 
-	const newUser = await User.create({ ...req.body, password: hashPassword });
+	// function generateAvatarUrl(email, options = {}) {
+	// 	const defaultImage = options.defaultImage || 'identicon';
+	// 	const emailHash = crypto.createHash('md5').update(email).digest('hex');
+	// 	return `https://www.gravatar.com/avatar/${emailHash}?d=${defaultImage}`;
+	// }
+
+	const avatar = generateAvatarUrl(email, {
+		defaultImage: 'monsterid',
+	});
+
+	// const avatar = gravatar.url(email, {
+	// 	defaultImage: 'monsterid',
+	// });
+
+	const newUser = await User.create({
+		...req.body,
+		password: hashPassword,
+		avatarUrl: avatar,
+	});
+	console.log(newUser);
 
 	res.status(201).json({
 		email: newUser.email,

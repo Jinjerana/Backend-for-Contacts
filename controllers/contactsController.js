@@ -1,3 +1,6 @@
+import fs from 'fs/promises';
+import path from 'path';
+
 import Contact from '../models/contact.js';
 
 import HttpError from '../helpers/HttpError.js';
@@ -9,6 +12,8 @@ import {
 	contactUpdateById,
 	contactFavoriteSchema,
 } from '../schemas/contact-schemas.js';
+
+const avatarsPath = path.resolve('public', 'avatars');
 
 const getAllContacts = async (req, res) => {
 	const { _id: owner } = req.user;
@@ -24,8 +29,12 @@ const getAllContacts = async (req, res) => {
 
 const add = async (req, res) => {
 	const { _id: owner } = req.user;
+	const { path: oldPath, filename } = req.file;
+	const newPath = path.join(avatarsPath, filename);
+	await fs.rename(oldPath, newPath);
+	const avatar = path.join('avatars', filename);
 	const { error } = contactAddSchema.validate(req.body);
-	const result = await Contact.create({ ...req.body, owner });
+	const result = await Contact.create({ ...req.body, avatar, owner });
 	if (error) {
 		throw new HttpError(406, error.message);
 	}
