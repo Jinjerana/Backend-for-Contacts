@@ -16,4 +16,6 @@ usersRouter.get('/current', authenticate, usersController.getCurrent);
 
 usersRouter.post('/signout', authenticate, usersController.signout);
 
+usersRouter.patch('/avatars', usersController.updateAvatar);
+
 export default usersRouter;

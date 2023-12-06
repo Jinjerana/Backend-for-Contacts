@@ -27,19 +27,9 @@ const signup = async (req, res) => {
 
 	const hashPassword = await bcrypt.hash(password, 10);
 
-	// function generateAvatarUrl(email, options = {}) {
-	// 	const defaultImage = options.defaultImage || 'identicon';
-	// 	const emailHash = crypto.createHash('md5').update(email).digest('hex');
-	// 	return `https://www.gravatar.com/avatar/${emailHash}?d=${defaultImage}`;
-	// }
-
 	const avatar = generateAvatarUrl(email, {
 		defaultImage: 'monsterid',
 	});
-
-	// const avatar = gravatar.url(email, {
-	// 	defaultImage: 'monsterid',
-	// });
 
 	const newUser = await User.create({
 		...req.body,
@@ -98,9 +88,61 @@ const signout = async (req, res) => {
 	});
 };
 
+// const updateAvatar = async (req, res) => {
+// 	const { avatarURL } = req.user;
+
+// 	const result = await User.findOneAndUpdate(avatarURL, req.body);
+// 	if (error) {
+// 		throw new HttpError(401, `Not authorized`);
+// 	}
+// 	res.json(result);
+// };
+
+const updateAvatar = async (req, res) => {
+	const { _id } = req.user;
+	console.log(_id);
+	const { avatar } = req.body;
+	console.log(req.body);
+
+	// const { _id: avatarURL } = req.user;
+
+	const result = await User.findByIdAndUpdate(_id, { avatar });
+	if (error) {
+		throw new HttpError(401, `Not authorized`);
+	}
+	res.json(result);
+};
+
+// const updateAvatar = async (req, res) => {
+// 	const { avatar } = req.body;
+// 	console.log(req.params);
+// 	// const { _id: avatarURL } = req.user;
+
+// 	const result = await User.findOneAndUpdate(avatar, req.body);
+// 	if (error) {
+// 		throw new HttpError(401, `Not authorized`);
+// 	}
+// 	res.json(result);
+// };
+
+// const updateByIdFavorite = async (req, res) => {
+// 	const { contactId } = req.params;
+// 	const { _id: owner } = req.user;
+// 	const { error } = contactFavoriteSchema.validate(req.body);
+// 	const result = await Contact.findOneAndUpdate(
+// 		{ _id: contactId, owner },
+// 		req.body
+// 	);
+// 	if (error) {
+// 		throw new HttpError(404, `Contact with id=${contactId} not found`);
+// 	}
+// 	res.json(result);
+// };
+
 export default {
 	signup: ctrlWrapper(signup),
 	signin: ctrlWrapper(signin),
 	getCurrent: ctrlWrapper(getCurrent),
 	signout: ctrlWrapper(signout),
+	updateAvatar: ctrlWrapper(updateAvatar),
 };

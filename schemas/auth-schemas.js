@@ -15,9 +15,14 @@ export const userSignupSchema = Joi.object({
 	// 	'any.required': `"subscription" is a required field`,
 	// 	'string.base': `"subscription" should be a type of 'text'`,
 	// }),
+	// avatar: Joi.
 });
 
 export const userSigninSchema = Joi.object().keys({
 	password: userSignupSchema.extract('password'),
 	email: userSignupSchema.extract('email'),
 });
+
+// export const userUpdateAvatarSchema = Joi.object({
+// 	avatar: Joi.file().required(),
+// });
