@@ -2,6 +2,10 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import gravatar from 'gravatar';
 import crypto from 'crypto';
+import Jimp from 'jimp';
+
+import fs from 'fs/promises';
+import path from 'path';
 
 import User from '../models/users.js';
 import jwt from 'jsonwebtoken';
@@ -15,6 +19,8 @@ import ctrlWrapper from '../Wrapper/ctrlWrapper.js';
 import { userSignupSchema, userSigninSchema } from '../schemas/auth-schemas.js';
 
 dotenv.config();
+
+const avatarsPath = path.resolve('public', 'avatars');
 
 const { JWT_SECRET } = process.env;
 
@@ -73,6 +79,7 @@ const signin = async (req, res) => {
 
 const getCurrent = async (req, res) => {
 	const { email } = req.user;
+	console.log(req.user);
 
 	res.json({
 		email,
@@ -88,56 +95,27 @@ const signout = async (req, res) => {
 	});
 };
 
-// const updateAvatar = async (req, res) => {
-// 	const { avatarURL } = req.user;
-
-// 	const result = await User.findOneAndUpdate(avatarURL, req.body);
-// 	if (error) {
-// 		throw new HttpError(401, `Not authorized`);
-// 	}
-// 	res.json(result);
-// };
-
 const updateAvatar = async (req, res) => {
 	const { _id } = req.user;
-	console.log(_id);
-	const { avatar } = req.body;
-	console.log(req.body);
+	// console.log(_id);
+	// const { avatar } = req.body;
+	// console.log(req.body);
 
-	// const { _id: avatarURL } = req.user;
+	const { path: oldPath, filename } = req.file;
 
-	const result = await User.findByIdAndUpdate(_id, { avatar });
+	const newPath = path.join(avatarsPath, filename);
+
+	(await Jimp.read(oldPath)).resize(250, 250).write(oldPath);
+
+	await fs.rename(oldPath, newPath);
+	const avatarUrl = path.join('avatars', filename);
+
+	const result = await User.findByIdAndUpdate(_id, { avatarUrl });
 	if (error) {
 		throw new HttpError(401, `Not authorized`);
 	}
 	res.json(result);
 };
-
-// const updateAvatar = async (req, res) => {
-// 	const { avatar } = req.body;
-// 	console.log(req.params);
-// 	// const { _id: avatarURL } = req.user;
-
-// 	const result = await User.findOneAndUpdate(avatar, req.body);
-// 	if (error) {
-// 		throw new HttpError(401, `Not authorized`);
-// 	}
-// 	res.json(result);
-// };
-
-// const updateByIdFavorite = async (req, res) => {
-// 	const { contactId } = req.params;
-// 	const { _id: owner } = req.user;
-// 	const { error } = contactFavoriteSchema.validate(req.body);
-// 	const result = await Contact.findOneAndUpdate(
-// 		{ _id: contactId, owner },
-// 		req.body
-// 	);
-// 	if (error) {
-// 		throw new HttpError(404, `Contact with id=${contactId} not found`);
-// 	}
-// 	res.json(result);
-// };
 
 export default {
 	signup: ctrlWrapper(signup),
