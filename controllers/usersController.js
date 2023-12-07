@@ -20,9 +20,9 @@ import { userSignupSchema, userSigninSchema } from '../schemas/auth-schemas.js';
 
 dotenv.config();
 
-const avatarsPath = path.resolve('public', 'avatars');
-
 const { JWT_SECRET } = process.env;
+
+const avatarsPath = path.resolve('public', 'avatars');
 
 const signup = async (req, res) => {
 	const { email, password } = req.body;
@@ -42,7 +42,6 @@ const signup = async (req, res) => {
 		password: hashPassword,
 		avatarUrl: avatar,
 	});
-	console.log(newUser);
 
 	res.status(201).json({
 		email: newUser.email,
@@ -79,8 +78,6 @@ const signin = async (req, res) => {
 
 const getCurrent = async (req, res) => {
 	const { email } = req.user;
-	console.log(req.user);
-
 	res.json({
 		email,
 	});
@@ -97,9 +94,6 @@ const signout = async (req, res) => {
 
 const updateAvatar = async (req, res) => {
 	const { _id } = req.user;
-	// console.log(_id);
-	// const { avatar } = req.body;
-	// console.log(req.body);
 
 	const { path: oldPath, filename } = req.file;
 
