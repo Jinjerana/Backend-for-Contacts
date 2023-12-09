@@ -4,7 +4,7 @@ import usersController from '../../controllers/usersController.js';
 
 import authenticate from '../../middlewares/authenticate.js';
 
-import upload from '../../middlewares/upload.js';
+import uploadTmp from '../../middlewares/uploadTmp.js';
 
 const usersRouter = express.Router();
 
@@ -19,7 +19,7 @@ usersRouter.post('/signout', authenticate, usersController.signout);
 usersRouter.patch(
 	'/avatars',
 	authenticate,
-	upload.single('avatarUrl'),
+	uploadTmp.single('avatar'),
 	usersController.updateAvatar
 );
 

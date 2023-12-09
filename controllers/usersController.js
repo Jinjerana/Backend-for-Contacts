@@ -10,7 +10,7 @@ import path from 'path';
 import User from '../models/users.js';
 import jwt from 'jsonwebtoken';
 
-import generateAvatarUrl from '../middlewares/gravatar.js';
+import generateAvatarUrl from '../helpers/gravatar.js';
 
 import HttpError from '../helpers/HttpError.js';
 
@@ -26,6 +26,7 @@ const avatarsPath = path.resolve('public', 'avatars');
 
 const signup = async (req, res) => {
 	const { email, password } = req.body;
+
 	const user = await User.findOne({ email });
 	if (user) {
 		throw new HttpError(409, 'Email in use');
@@ -96,6 +97,7 @@ const updateAvatar = async (req, res) => {
 	const { _id } = req.user;
 
 	const { path: oldPath, filename } = req.file;
+	console.log(req.file);
 
 	const newPath = path.join(avatarsPath, filename);
 
@@ -104,11 +106,12 @@ const updateAvatar = async (req, res) => {
 	await fs.rename(oldPath, newPath);
 	const avatarUrl = path.join('avatars', filename);
 
-	const result = await User.findByIdAndUpdate(_id, { avatarUrl });
+	await User.findByIdAndUpdate(_id, { avatarUrl }, { new: true });
 	if (error) {
 		throw new HttpError(401, `Not authorized`);
 	}
-	res.json(result);
+	res.status(200).json({ avatarUrl });
+	// res.json(result);
 };
 
 export default {
