@@ -4,6 +4,8 @@ import contactsController from '../../controllers/contactsController.js';
 
 import authenticate from '../../middlewares/authenticate.js';
 
+import upload from '../../middlewares/upload.js';
+
 const contactsRouter = express.Router();
 
 contactsRouter.use(authenticate);
@@ -11,7 +13,7 @@ contactsRouter.use(authenticate);
 contactsRouter
 	.route('/')
 	.get(contactsController.getAllContacts)
-	.post(contactsController.add);
+	.post(upload.single('avatar'), contactsController.add);
 
 contactsRouter
 	.route('/:contactId')
