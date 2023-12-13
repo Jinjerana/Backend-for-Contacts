@@ -39,4 +39,29 @@ app.use(notFoundHandler);
 
 app.use(globalErrorHandler);
 
+import sgMail from '@sendgrid/mail';
+
+dotenv.config();
+
+const { SENDGRID_API_TOKEN, SENDGRID_EMAIL_FROM } = process.env;
+
+sgMail.setApiKey(SENDGRID_API_TOKEN);
+
+const msg = {
+	to: 'kocano5659@getmola.com',
+	from: SENDGRID_EMAIL_FROM, // Use the email address or domain you verified above
+	subject: 'Test Email',
+	text: 'Nest Email with Node.js',
+	html: '<strong>Test is easy to do anywhere, even with Node.js</strong>',
+};
+//ES6
+sgMail
+	.send(msg)
+	.then(() => {
+		console.log('Email sent');
+	})
+	.catch((error) => {
+		console.error(error);
+	});
+
 export default app;

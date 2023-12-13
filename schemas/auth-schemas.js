@@ -23,6 +23,10 @@ export const userSigninSchema = Joi.object().keys({
 	email: userSignupSchema.extract('email'),
 });
 
+export const userEmailSchema = Joi.object().keys({
+	email: userSignupSchema.extract('email'),
+});
+
 // export const userUpdateAvatarSchema = Joi.object({
 // 	avatar: Joi.file().required(),
 // });

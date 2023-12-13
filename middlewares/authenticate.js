@@ -15,7 +15,7 @@ const { JWT_SECRET } = process.env;
 
 const authenticate = async (req, res, next) => {
 	const { authorization } = req.headers;
-	console.log(authorization);
+
 	if (!authorization) {
 		throw new HttpError(401, 'Authorization header not found');
 	}
