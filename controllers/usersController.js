@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
-import gravatar from 'gravatar';
-import crypto from 'crypto';
 import Jimp from 'jimp';
+import { nanoid } from 'nanoid';
+
+import sgMail from '@sendgrid/mail';
 
 import fs from 'fs/promises';
 import path from 'path';
@@ -14,9 +15,9 @@ import generateAvatarUrl from '../helpers/gravatar.js';
 
 import HttpError from '../helpers/HttpError.js';
 
-import ctrlWrapper from '../Wrapper/ctrlWrapper.js';
+import sendgrid from '../helpers/sendgrid.js';
 
-import { userSignupSchema, userSigninSchema } from '../schemas/auth-schemas.js';
+import ctrlWrapper from '../Wrapper/ctrlWrapper.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ const signup = async (req, res) => {
 	}
 
 	const hashPassword = await bcrypt.hash(password, 10);
+	const verificationToken = nanoid();
 
 	const avatar = generateAvatarUrl(email, {
 		defaultImage: 'monsterid',
@@ -41,12 +43,47 @@ const signup = async (req, res) => {
 	const newUser = await User.create({
 		...req.body,
 		password: hashPassword,
+		verificationToken,
 		avatarUrl: avatar,
 	});
+
+	await sendgrid();
 
 	res.status(201).json({
 		email: newUser.email,
 		subscription: newUser.subscription,
+	});
+};
+
+const verify = async (req, res) => {
+	const { verificationToken } = req.params;
+
+	const user = await User.findOne({ verificationToken });
+	if (!user) {
+		throw new HttpError(404, 'User not found');
+	}
+
+	await User.findOneAndUpdate(user._id, {
+		verify: true,
+		verificationToken: '',
+	});
+
+	res.json({ message: 'Verification successful' });
+};
+
+const resendVerify = async (req, res) => {
+	const { email } = req.body;
+	const user = await User.findOne({ email });
+	if (!user) {
+		throw new HttpError(400, 'missing required field email');
+	}
+	if (user.verify) {
+		throw new HttpError(400, 'Verification has already been passed');
+	}
+	await sendgrid();
+
+	res.json({
+		message: 'Verification successful',
 	});
 };
 
@@ -56,6 +93,11 @@ const signin = async (req, res) => {
 	if (!user) {
 		throw new HttpError(401, 'email or password is wrong');
 	}
+
+	if (!user.verify) {
+		throw new HttpError(401, 'email not verify');
+	}
+
 	const passwordCompare = await bcrypt.compare(password, user.password);
 	if (!passwordCompare) {
 		throw new HttpError(401, 'email or password is wrong');
@@ -72,7 +114,6 @@ const signin = async (req, res) => {
 		token,
 		user: {
 			email,
-			// subscription,
 		},
 	});
 };
@@ -97,7 +138,6 @@ const updateAvatar = async (req, res) => {
 	const { _id } = req.user;
 
 	const { path: oldPath, filename } = req.file;
-	console.log(req.file);
 
 	const newPath = path.join(avatarsPath, filename);
 
@@ -111,7 +151,6 @@ const updateAvatar = async (req, res) => {
 		throw new HttpError(401, `Not authorized`);
 	}
 	res.status(200).json({ avatarUrl });
-	// res.json(result);
 };
 
 export default {
@@ -120,4 +159,6 @@ export default {
 	getCurrent: ctrlWrapper(getCurrent),
 	signout: ctrlWrapper(signout),
 	updateAvatar: ctrlWrapper(updateAvatar),
+	verify: ctrlWrapper(verify),
+	resendVerify: ctrlWrapper(resendVerify),
 };
