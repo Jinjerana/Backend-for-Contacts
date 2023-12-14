@@ -19,11 +19,9 @@ import sendgrid from '../helpers/sendgrid.js';
 
 import ctrlWrapper from '../Wrapper/ctrlWrapper.js';
 
-import { userSignupSchema, userSigninSchema } from '../schemas/auth-schemas.js';
-
 dotenv.config();
 
-const { JWT_SECRET, BASE_URL, SENDGRID_EMAIL_FROM } = process.env;
+const { JWT_SECRET } = process.env;
 
 const avatarsPath = path.resolve('public', 'avatars');
 
@@ -49,17 +47,7 @@ const signup = async (req, res) => {
 		avatarUrl: avatar,
 	});
 
-	// const msg = {
-	// 	to: 'pihodec821@hupoi.com',
-	// 	from: SENDGRID_EMAIL_FROM, // Use the email address or domain you verified above
-	// 	subject: 'Test Email',
-	// 	text: 'Nest Email with Node.js',
-	// 	html: `<a target='_blank' href='${BASE_URL}/users/verify/${verificationToken}'>Click to verify</a>`,
-	// };
-
 	await sendgrid();
-
-	// ${verificationToken}
 
 	res.status(201).json({
 		email: newUser.email,
@@ -126,7 +114,6 @@ const signin = async (req, res) => {
 		token,
 		user: {
 			email,
-			// subscription,
 		},
 	});
 };
@@ -151,7 +138,6 @@ const updateAvatar = async (req, res) => {
 	const { _id } = req.user;
 
 	const { path: oldPath, filename } = req.file;
-	console.log(req.file);
 
 	const newPath = path.join(avatarsPath, filename);
 
@@ -165,7 +151,6 @@ const updateAvatar = async (req, res) => {
 		throw new HttpError(401, `Not authorized`);
 	}
 	res.status(200).json({ avatarUrl });
-	// res.json(result);
 };
 
 export default {

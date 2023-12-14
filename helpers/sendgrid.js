@@ -18,7 +18,7 @@ const sendgrid = () => {
 			html: `<a target='_blank' href='${BASE_URL}/users/verify/${verificationToken}'>Click to verify</a>`,
 		};
 	};
-	//ES6
+
 	sgMail
 		.send(msg)
 		.then(() => {
